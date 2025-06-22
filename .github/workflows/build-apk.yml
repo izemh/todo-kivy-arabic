@@ -16,9 +16,22 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt update
-        sudo apt install -y zip unzip openjdk-17-jdk python3-pip git build-essential
+        sudo apt install -y zip unzip openjdk-17-jdk python3-pip git build-essential wget
         pip install --upgrade pip
         pip install buildozer cython
+
+    - name: Download Android Command Line Tools
+      run: |
+        mkdir -p ~/.android
+        wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
+        unzip cmdline-tools.zip -d cmdline-tools
+        mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+        mv cmdline-tools/cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+
+    - name: Install SDK Build Tools using sdkmanager
+      run: |
+        yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+          "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
     - name: Build APK
       run: |
