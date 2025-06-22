@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v3
 
     - name: Install dependencies
@@ -18,19 +18,18 @@ jobs:
         sudo apt update
         sudo apt install -y zip unzip openjdk-17-jdk python3-pip git build-essential wget
         pip install --upgrade pip
-        pip install buildozer cython
+        pip install cython buildozer
 
-    - name: Download Android Command Line Tools
+    - name: Setup Android SDK (cmdline-tools)
       run: |
-        mkdir -p ~/.android
+        mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools
         wget https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O cmdline-tools.zip
-        unzip cmdline-tools.zip -d cmdline-tools
-        mkdir -p ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
-        mv cmdline-tools/cmdline-tools/* ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
+        unzip cmdline-tools.zip -d cmdline-tools-temp
+        mv cmdline-tools-temp/cmdline-tools ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest
 
-    - name: Install SDK Build Tools using sdkmanager
+    - name: Install Android SDK components
       run: |
-        yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager \
+        yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=${HOME}/.buildozer/android/platform/android-sdk \
           "platform-tools" "platforms;android-30" "build-tools;30.0.3"
 
     - name: Build APK
